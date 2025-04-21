@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Healing Meditation</title>
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('static/wallpaper2you_488774.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #ffffff;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+
+    #meditationContent {
+      display: none;
+      max-width: 90%;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #ffdd99;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      font-size: 1.5em;
+      margin-bottom: 1em;
+      opacity: 0;
+      animation: fadeIn 3s forwards;
+      line-height: 1.5;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .breathe-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.15);
+      margin: 20px auto;
+      animation: breatheInOut 7s ease-in-out infinite;
+      display: none;
+    }
+
+    @keyframes breatheInOut {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffaa33;
+      color: white;
+      cursor: pointer;
+      margin-top: 25px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff8c00;
+    }
+    body.bg-second {
+  background: url('static/il_570xN.946479446_h42q.webp') no-repeat center center fixed;
+  background-size: cover;
+}
+  </style>
+</head>
+<body>
+
+  <div id="initial">
+    <h1>Guided Healing Meditation</h1>
+    <button onclick="startMeditation()">Begin Journey</button>
+  </div>
+
+  <div id="meditationContent">
+    <div class="message" id="message"></div>
+    <div id="seatedButtonContainer"></div>
+    <div class="breathe-circle" id="circle"></div>
+  </div>
+
+  <audio id="music" src="static/recording-2025-04-20-21-42-39.mp3"></audio>
+
+  <script>
+    const messages = [
+      "Welcome. Let's begin this journey together. Breathe slowly.",
+      "Sit comfortably... and allow the world around you to melt away for a moment.",
+      "Now, think about a time you were deeply hurt.",
+      "Let that moment surface... not to relive it, but to let it go.",
+      "Breathe in slowly. Feel all positivity is coming inside you. Let the air reach deep within you.",
+      "Breathe out. With it, release that pain of regret, anger and hurt.",
+      "Think about someone who disappointed you, or broke your trust.",
+      "It’s okay to feel that pain. Acknowledge it. You're not weak for feeling.",
+      "Now, tell yourself: I am ready to let this go, for my own peace.",
+      "Inhale... draw in calm, serenity.",
+      "Exhale... release the weight they placed on your heart.",
+      "Again Inhale... all the positivity and love is coming inside you.",
+      "Exhale... release the weight they placed on your heart.",
+      "Now think of someone you truly love. Feel their presence with you.",
+      "What do you love most about them? Let that warmth surround your heart.",
+      "That love you feel? It lives within you. It’s always been there.",
+      "Now... turn that same love towards yourself.",
+      "Say silently: I am enough. I am worthy. I am healing.",
+      "There is nothing wrong with you. You are growing.",
+      "Forgive yourself for not knowing better before. You were surviving.",
+      "Repeat gently: I forgive them... and I free myself.",
+      "Now breathe again... deeply. In and out.",
+      "Imagine golden light filling your chest... expanding gently.",
+      "Feel your heart opening — soft, light, at peace.",
+      "Whisper this truth: I am love. I am light. I am free.",
+      "Carry this peace with you."
+    ];
+
+    let i = 0;
+
+    function startMeditation() {
+      document.getElementById("initial").style.display = "none";
+      document.getElementById("meditationContent").style.display = "block";
+
+      const messageEl = document.getElementById("message");
+      const buttonContainer = document.getElementById("seatedButtonContainer");
+
+      messageEl.innerText = "Find a quiet place... Sit comfortably with your spine relaxed.";
+      const seatedButton = document.createElement("button");
+      seatedButton.innerText = "I’m ready";
+      seatedButton.onclick = () => {
+        seatedButton.style.display = "none";
+        document.getElementById("music").play();
+        buttonContainer.innerHTML = '';
+        setTimeout(() => showMessage(i), 1500);
+      };
+
+      setTimeout(() => {
+        buttonContainer.appendChild(seatedButton);
+      }, 4000);
+    }
+
+    function showMessage(index) {
+  if (index >= messages.length) return;
+
+  const messageEl = document.getElementById("message");
+  const circle = document.getElementById("circle");
+
+  const currentMessage = messages[index];
+  messageEl.innerText = currentMessage;
+
+  // Change background when we reach the emotional turning point
+  if (currentMessage.includes("Now think of someone you truly love. Feel their presence with you.")) {
+    document.body.classList.add("bg-second");
+  }
+
+  // Show or hide breathing animation
+  if (currentMessage.toLowerCase().includes("breathe")) {
+    circle.style.display = "block";
+  } else {
+    circle.style.display = "none";
+  }
+
+  i++;
+  setTimeout(() => showMessage(i), 20000);
+}
+
+  </script>
+
+</body>
+</html>

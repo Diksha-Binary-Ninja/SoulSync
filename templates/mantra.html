@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Focus Attention - Mantra Meditation</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: black;
+      color: white;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.5s ease-in-out;
+    }
+    .container {
+      padding: 40px;
+      background-color: rgba(0, 0, 0, 0.6);
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .start-btn, .mantra-btn {
+      padding: 15px 25px;
+      font-size: 1.2em;
+      margin: 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background-color: #ffd700;
+      color: #333;
+      transition: transform 0.2s;
+    }
+    .start-btn:hover, .mantra-btn:hover {
+      transform: scale(1.05);
+    }
+    .mantra-options {
+      margin-top: 30px;
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .god-info {
+      margin-top: 30px;
+      font-size: 1.1em;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: rgba(0,0,0,0.5);
+    }
+    img {
+      max-width: 200px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🕉️ Focus Attention - Mantra Meditation</h1>
+    <button class="start-btn" onclick="showOptions()">Start</button>
+
+    <div class="mantra-options" id="mantraOptions">
+      <button class="mantra-btn" onclick="showGod('Happiness')">Mantra for Happiness</button>
+      <button class="mantra-btn" onclick="showGod('Relationship')">Mantra for Relationship</button>
+      <button class="mantra-btn" onclick="showGod('Protection')">Mantra for Protection</button>
+      <button class="mantra-btn" onclick="showGod('Release')">Mantra for Releasing Negativity</button>
+      <button class="mantra-btn" onclick="showGod('Wisdom')">Mantra for Wisdom</button>
+      <button class="mantra-btn" onclick="showGod('NewBeginnings')">Mantra for New Beginnings</button>
+      <button class="mantra-btn" onclick="showGod('Health')">Mantra for Health</button>
+      <button class="mantra-btn" onclick="showGod('WishFulfillment')">Mantra for Wish Fulfillment</button>
+    </div>
+
+    <div class="god-info" id="godInfo"></div>
+    <audio id="mantraAudio" autoplay loop></audio>
+  </div>
+
+  <script>
+    const deities = {
+      "Happiness": {
+        name: "Goddess Lakshmi",
+        mantra: "Om Shreem Mahalakshmiyei Namaha",
+        image: "/static/gods/lakshmi.jpg",
+        bg: "/static/backgrounds/lakshmi_bg.jpg",
+        audio: "/static/audios/lakshmi.mp3"
+      },
+      "Relationship": {
+        name: "Lord Krishna",
+        mantra: "Om Kleem Krishnaya Namaha",
+        image: "/static/gods/krishna.jpg",
+        bg: "/static/backgrounds/krishna_bg.jpg",
+        audio: "/static/audios/krishna.mp3"
+      },
+      "Protection": {
+        name: "Lord Hanuman",
+        mantra: "Om Hanumate Namah",
+        image: "/static/gods/hanuman.jpg",
+        bg: "/static/backgrounds/hanuman_bg.jpg",
+        audio: "/static/audios/hanuman.mp3"
+      },
+      "Release": {
+        name: "Lord Shiva",
+        mantra: "Om Namah Shivaya",
+        image: "/static/gods/shiva.jpg",
+        bg: "/static/backgrounds/shiva_bg.jpg",
+        audio: "/static/audios/shiva.mp3"
+      },
+      "Wisdom": {
+        name: "Goddess Saraswati",
+        mantra: "Om Aim Saraswatyai Namaha",
+        image: "/static/gods/saraswati.jpg",
+        bg: "/static/backgrounds/saraswati_bg.jpg",
+        audio: "/static/audios/saraswati.mp3"
+      },
+      "NewBeginnings": {
+        name: "Lord Ganesha",
+        mantra: "Om Gam Ganapataye Namaha",
+        image: "/static/gods/ganesha.jpg",
+        bg: "/static/backgrounds/ganesha_bg.jpg",
+        audio: "/static/audios/ganesha.mp3"
+      },
+      "Health": {
+        name: "Lord Dhanvantari",
+        mantra: "Om Namo Bhagavate Vasudevaya Dhanvantaraye Amritakalasha Hastaya",
+        image: "/static/gods/dhanvantari.jpg",
+        bg: "/static/backgrounds/dhanvantari_bg.jpg",
+        audio: "/static/audios/dhanvantari.mp3"
+      },
+      "WishFulfillment": {
+        name: "Goddess Kamakhya",
+        mantra: "Om Kamakhya Devi Namah",
+        image: "/static/gods/kamakhya.jpg",
+        bg: "/static/backgrounds/kamakhya_bg.jpg",
+        audio: "/static/audios/kamakhya.mp3"
+      }
+    };
+
+    function showOptions() {
+      document.getElementById('mantraOptions').style.display = 'flex';
+    }
+
+    function showGod(type) {
+      const god = deities[type];
+      const godDiv = document.getElementById('godInfo');
+      document.body.style.backgroundImage = `url('${god.bg}')`;
+
+      const audio = document.getElementById('mantraAudio');
+      audio.src = god.audio;
+      audio.play();
+
+      godDiv.innerHTML = `
+        <h2>${god.name}</h2>
+        <p><strong>Mantra:</strong> ${god.mantra}</p>
+        <img src="${god.image}" alt="${god.name}" />
+      `;
+    }
+  </script>
+</body>
+</html>

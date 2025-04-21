@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visualization Meditation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to top right, #cde9f9, #f0f8ff);
+      overflow-x: hidden;
+    }
+    .container {
+      padding: 50px 20px;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+    h1, h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 32px;
+      border: none;
+      font-size: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+    .scene-selection {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .scene-selection img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 4px solid transparent;
+      transition: 0.4s ease;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    .scene-selection img:hover {
+      border-color: #4CAF50;
+      transform: scale(1.05);
+    }
+    #fullScene {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10;
+    }
+    #fullScene img {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.85);
+    }
+    #sceneText {
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      position: absolute;
+      top: 15%;
+      width: 100%;
+      text-align: center;
+      text-shadow: 3px 3px 6px #000;
+      animation: fadeInText 2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInText {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="step1">
+    <h1>Visualization Meditation</h1>
+    <button onclick="goToStep2()">Start Meditation</button>
+  </div>
+
+  <div class="container" id="step2" style="display: none;">
+    <h2>Sit somewhere comfortable where no one will disturb you.</h2>
+    <button onclick="goToSceneSelection()">I am seated properly</button>
+  </div>
+
+  <div class="container" id="sceneSelection" style="display: none;">
+    <h2>Select a scenery you love</h2>
+    <div class="scene-selection">
+      <img src="{{ url_for('static', filename='328520.jpg') }}" data-audio="{{ url_for('static', filename='The Great Oak Guided Sleep Story Meditation (The Haven Series).mp3') }}" onclick="selectScene(this)">
+      <img src="{{ url_for('static', filename='full-moon-over-the-river-in-the-forest-at-night-nature-background-photo.jpg') }}" data-audio="{{ url_for('static', filename='GUIDED SLEEP MEDITATION STORY The Faerie Wood Deep Relaxation (Haven Series).mp3') }}" onclick="selectScene(this)">
+      <img src="{{ url_for('static', filename='1000_F_207689727_eRH9u5NIQB5VuUXv30Anq0SHdk56w6FQ.jpg') }}" data-audio="{{ url_for('static', filename='GUIDED SLEEP MEDITATION STORY_ A Quiet Harbour Deep Relaxation, Study, Sleep, Spa, Zen..mp3') }}" onclick="selectScene(this)">
+      <img src="{{ url_for('static', filename='pexels-fabianwiktor-994605.jpg') }}" data-audio="{{ url_for('static', filename='GUIDED MEDITATION -The Tropical Beach - Deep Relaxation & Sleep.mp3') }}" onclick="selectScene(this)">
+    </div>
+  </div>
+
+  <div id="fullScene">
+    <img id="selectedScene" src="">
+    <div id="sceneText">Notice what you love about this scenery</div>
+  </div>
+
+  <audio id="guidedAudio" src="{{ url_for('static', filename='guided-visualization.mp3') }}"></audio>
+
+  <script>
+    function goToStep2() {
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+    }
+
+    function goToSceneSelection() {
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('sceneSelection').style.display = 'block';
+    }
+
+    function selectScene(imgElement) {
+      document.getElementById('sceneSelection').style.display = 'none';
+      const fullScene = document.getElementById('fullScene');
+      const selectedScene = document.getElementById('selectedScene');
+      const audioPlayer = document.getElementById('guidedAudio');
+
+      selectedScene.src = imgElement.src;
+      audioPlayer.src = imgElement.dataset.audio;
+      fullScene.style.display = 'block';
+
+      const text = document.getElementById('sceneText');
+      text.textContent = 'Notice what you love about this scenery';
+
+      setTimeout(() => {
+        text.textContent = 'Close your eyes and imagine you are in the same place';
+        setTimeout(() => {
+          audioPlayer.play();
+        }, 7000);
+      }, 7000);
+    }
+  </script>
+</body>
+</html>

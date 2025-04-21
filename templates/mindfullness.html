@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mindfulness Meditation</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f0fdf4, #dbeafe);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #1e3a8a;
+      margin-bottom: 30px;
+      max-width: 90%;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    button {
+      padding: 14px 30px;
+      font-size: 1.2rem;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2563eb;
+      transform: scale(1.05);
+    }
+
+    #circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #93c5fd, #60a5fa);
+      margin: 30px auto;
+      transition: all 3s ease-in-out;
+      display: none;
+    }
+
+    .fade {
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .background-effect {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      background: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+      opacity: 0.1;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background-effect"></div>
+  <h1 id="instruction">Click start to begin your mindfulness journey</h1>
+  <button id="startBtn" onclick="startMeditation()">Start Meditation</button>
+  <div id="circle"></div>
+
+  <audio id="bgMusic" src="{{ url_for('static', filename='deep-meditation-192828.mp3') }}" loop></audio>
+  <audio id="guidedAudio" src="{{ url_for('static', filename='Mindfulness Meditation - Guided 10 Minutes.mp3') }}"></audio>
+
+  <script>
+    const steps = [
+      { text: "Sit in a comfortable place and relax", btn: "I have seated properly" },
+      { type: "breathe", times: 5 },
+      { type: "focus", parts: ["feet", "legs", "stomach", "chest", "back", "arms", "shoulders", "neck", "forehead", "jaw"] },
+      { text: "Close your eyes and relax.", duration: 10000 }
+    ];
+
+    let index = 0;
+
+    function startMeditation() {
+      const instruction = document.getElementById('instruction');
+      const btn = document.getElementById('startBtn');
+      const circle = document.getElementById('circle');
+      const bgMusic = document.getElementById('bgMusic');
+      const guidedAudio = document.getElementById('guidedAudio');
+
+      bgMusic.play();
+
+      function nextStep() {
+        const step = steps[index++];
+
+        if (!step) {
+          bgMusic.pause();
+          bgMusic.currentTime = 0;
+          instruction.innerText = "🎵 Your guided audio will now begin... 🎵";
+          instruction.classList.add("fade");
+          guidedAudio.play();
+          return;
+        }
+
+        if (step.text && !step.duration) {
+          instruction.innerText = step.text;
+          instruction.classList.add("fade");
+          btn.innerText = step.btn || "Next";
+          btn.onclick = nextStep;
+          btn.style.display = "inline-block";
+        } else if (step.type === "breathe") {
+          btn.style.display = "none";
+          let count = 0;
+          circle.style.display = "block";
+
+          function breathingCycle() {
+            if (count >= step.times) {
+              circle.style.display = "none";
+              nextStep();
+              return;
+            }
+
+            instruction.innerText = "Breathe In";
+            instruction.classList.add("fade");
+            circle.style.transform = "scale(1.8)";
+            setTimeout(() => {
+              instruction.innerText = "Breathe Out";
+              instruction.classList.add("fade");
+              circle.style.transform = "scale(1)";
+              setTimeout(() => {
+                count++;
+                breathingCycle();
+              }, 7000);
+            }, 7000);
+          }
+
+          breathingCycle();
+        } else if (step.type === "focus") {
+          btn.style.display = "none";
+          let i = 0;
+
+          function focusPart() {
+            if (i >= step.parts.length) {
+              nextStep();
+              return;
+            }
+            instruction.innerText = `Focus on your ${step.parts[i]}. Feel how relaxed and calm it is...`;
+            instruction.classList.add("fade");
+            i++;
+            setTimeout(focusPart, 7000);
+          }
+
+          focusPart();
+        } else {
+          instruction.innerText = step.text;
+          instruction.classList.add("fade");
+          btn.style.display = "none";
+          setTimeout(() => {
+            nextStep();
+          }, step.duration);
+        }
+      }
+
+      nextStep();
+    }
+  </script>
+
+</body>
+</html>
