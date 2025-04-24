@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+import os
 
 app = Flask(__name__)
 
@@ -6,7 +7,6 @@ app = Flask(__name__)
 def home():
     return render_template("index.html")
 
-# Placeholder routes for future meditation pages
 @app.route("/mindfulness")
 def mindfulness():
     return render_template("mindfullness.html")
@@ -15,13 +15,10 @@ def mindfulness():
 def visualization():
     return render_template("visualization.html")
 
-@app.route("/focus")
-def focus():
-    return render_template("mantra.html")
-
 @app.route("/kindness")
 def kindness():
     return render_template("kindness.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # ✅ Needed for platforms like Render
+    app.run(host="0.0.0.0", port=port, debug=True)
