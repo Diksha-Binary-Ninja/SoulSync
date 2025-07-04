@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script defer data-domain="soulsync-4myt.onrender.com" src="https://plausible.io/js/script.outbound-links.pageview-props.revenue.js"></script>
-<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
-
   <meta charset="UTF-8">
   <title>Meditation App</title>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
@@ -92,9 +89,253 @@
   <div class="background-effect"></div>
   <h1>Choose Your Meditation</h1>
   <div class="grid">
+    <div class="card blue" onclick="location.href='/connect'">Connect to a Random User</div>
+
+    <div class="card pink" onclick="startPanicRelief()">Having Panic Attack?</div>
     <div class="card blue" onclick="location.href='/mindfulness'">Mindfulness Meditation</div>
     <div class="card green" onclick="location.href='/visualization'">Visualization Meditation</div>
     <div class="card pink" onclick="location.href='/kindness'">Loving-Kindness</div>
   </div>
+  <!-- Chat Interface -->
+<!-- Chat Interface -->
+<!-- Beautiful Chat Interface -->
+<div id="chatBox" style="display:none;position:fixed;bottom:20px;right:20px;width:400px;height:500px;background:white;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.2);padding:15px;z-index:999;flex-direction:column;">
+
+  <div id="status" style="color:#1d4ed8;font-weight:600;font-size:16px;"></div>
+  <div id="chat" style="flex:1;overflow-y:auto;border:1px solid #e5e7eb;border-radius:12px;padding:15px;background:#f9fafb;"></div>
+  <div style="display:flex; gap:8px;">
+  <textarea id="msg" placeholder="Type a message..." rows="2" style="padding:12px 14px; border-radius:10px; font-size:15px; border:1px solid #ccc; width:100%; resize:none;"></textarea>
+  <button id="sendBtn" style="background-color:#3b82f6;color:white;border:none;border-radius:10px;padding:10px 16px;font-weight:bold;cursor:pointer;">Send</button>
+</div>
+
+
+  <button id="endChatBtn" style="padding:10px; background-color:#ef4444; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">End Chat</button>
+</div>
+
+<!-- Socket.IO -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  const socket = io();
+  let username = "";
+  let typingTimeout;
+
+  const chatBox = document.getElementById("chatBox");
+  const chat = document.getElementById("chat");
+  const msgInput = document.getElementById("msg");
+  const status = document.getElementById("status");
+
+  function scrollToBottom() {
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function startChat() {
+    username = prompt("Enter your name to join chat:");
+    if (!username) return;
+
+    chatBox.style.display = "flex";
+    socket.emit("new-user-joined", username);
+  }
+
+  function appendMessage(text, who = "system") {
+    const msgEl = document.createElement("div");
+    msgEl.style.margin = "8px 0";
+
+    if (who === "you") {
+      msgEl.style.textAlign = "right";
+      msgEl.innerHTML = `<div style="display:inline-block;max-width:70%;background:#3b82f6;color:white;padding:10px 14px;border-radius:16px 16px 0 16px;">${text}</div>`;
+    } else if (who === "partner") {
+      msgEl.style.textAlign = "left";
+      msgEl.innerHTML = `<div style="display:inline-block;max-width:70%;background:#e2e8f0;color:#111827;padding:10px 14px;border-radius:16px 16px 16px 0;">${text}</div>`;
+    } else {
+      msgEl.innerHTML = `<div style="color:#6b7280;font-style:italic;font-size:14px;">${text}</div>`;
+    }
+
+    chat.appendChild(msgEl);
+    scrollToBottom();
+  }
+
+  msgInput.addEventListener("keypress", function (e) {
+    if (e.key === "Enter" && !e.shiftKey && msgInput.value.trim()) {
+      e.preventDefault();
+      socket.emit("send", msgInput.value);
+      appendMessage(msgInput.value, "you");
+      msgInput.value = "";
+    } else {
+      socket.emit("typing", username);
+    }
+  });
+document.getElementById("sendBtn").addEventListener("click", () => {
+  const msg = msgInput.value.trim();
+  if (msg) {
+    socket.emit("send", msg);
+    appendMessage(msg, "you");
+    msgInput.value = "";
+  }
+});
+
+  document.getElementById("endChatBtn").addEventListener("click", () => {
+    chatBox.style.display = "none";
+    socket.disconnect();
+    chat.innerHTML = "";
+    status.innerText = "";
+    socket.connect(); // allow reconnect if starting again
+  });
+
+  socket.on("connect-user", name => {
+    status.innerText = `You are connected to ${name}`;
+    appendMessage(`${name} joined the chat.`);
+  });
+
+  socket.on("waiting", msg => {
+    status.innerText = msg;
+  });
+
+  socket.on("receive", data => {
+    appendMessage(data.message, "partner");
+  });
+
+  socket.on("user-disconnected", msg => {
+    appendMessage(msg);
+    status.innerText = msg;
+  });
+
+  socket.on("typing", data => {
+    status.innerText = `${data.name} is typing...`;
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      status.innerText = `You are connected to ${data.name}`;
+    }, 2000);
+  });
+  function startPanicRelief() {
+    // Hide main grid and header
+    document.querySelector('.grid').style.display = 'none';
+    document.querySelector('h1').style.display = 'none';
+
+    // Show relaxation message and start music
+    const relaxMessage = document.createElement('p');
+    relaxMessage.id = 'relaxMessage';
+    relaxMessage.innerText = 'listen to this music for a moment and follow the instructions... Be calm everything is okay!';
+    relaxMessage.style.fontSize = '18px';
+    relaxMessage.style.color = '#1d4ed8';
+    relaxMessage.style.margin = '20px';
+    document.body.appendChild(relaxMessage);
+
+    // Add audio element
+    const audio = document.createElement('audio');
+    audio.id = 'relaxingMusic';
+    audio.src = '/static/perfect-beauty-191271.mp3';
+ // make sure it's in your static folder
+    audio.autoplay = true;
+    audio.style.display = 'none';
+    document.body.appendChild(audio);
+
+    // Breathing message
+    const instruction = document.createElement('div');
+    instruction.id = 'instructionMessage';
+    instruction.innerText = "Breathe in...";
+    instruction.style.fontSize = '24px';
+    instruction.style.fontWeight = 'bold';
+    instruction.style.textAlign = 'center';
+    instruction.style.marginTop = '20px';
+    document.body.appendChild(instruction);
+
+    let cycleCount = 0;
+const maxCycles = 5;
+
+const handleBreathingCycle = () => {
+  if (cycleCount < maxCycles) {
+    instruction.innerText = 'Breathe in...';
+    setTimeout(() => {
+      instruction.innerText = 'Breathe out...';
+      setTimeout(() => {
+        cycleCount++;
+        handleBreathingCycle();
+      }, 5000); // breathe out 5 seconds
+    }, 5000); // breathe in 5 seconds
+  } else {
+    instruction.remove();
+    relaxMessage.remove();
+    audio.pause();
+    audio.remove();
+    showGroundingPrompt();
+  }
+};
+
+handleBreathingCycle(); // no delay — start immediately
+  }
+
+  function showGroundingPrompt() {
+    const container = document.createElement('div');
+    container.style.padding = '20px';
+    container.style.textAlign = 'center';
+
+    container.innerHTML = `
+      <h2>Your breathing exercise is complete.</h2>
+      <p>Let’s continue with grounding questions.</p>
+      <p><strong>Count how many red objects you see around you.</strong></p>
+      <input type="number" id="redCount" placeholder="Enter count..." style="padding:10px;margin:10px;">
+      <button onclick="handleRedCount()" style="padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:6px;">Next</button>
+    `;
+    document.body.appendChild(container);
+  }
+
+  function handleRedCount() {
+    const count = document.getElementById('redCount').value;
+    if (!count) return alert("Please enter a number.");
+
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:30px;">
+        <h2>Has your panic attack slowed?</h2>
+        <button onclick="showMotivationalQuote()" style="padding:10px 20px;margin:10px;background:#10b981;color:white;border:none;border-radius:6px;">Yes</button>
+        <button onclick="showSensoryExercise()" style="padding:10px 20px;margin:10px;background:#ef4444;color:white;border:none;border-radius:6px;">No</button>
+      </div>
+    `;
+  }
+
+  function showMotivationalQuote() {
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:30px;">
+        <h2>“You are stronger than you think, and you have a lot of inner strength.”</h2>
+        <audio src="relaxing-meditation-231762.mp3" autoplay></audio>
+      </div>
+    `;
+  }
+
+  function showSensoryExercise() {
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:30px;">
+        <h2>Please list 3 sounds you are currently hearing:</h2>
+        <textarea id="sounds" rows="3" style="width:80%;padding:10px;"></textarea><br>
+        <button onclick="showSeeingPrompt()" style="margin-top:15px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:6px;">Next</button>
+      </div>
+    `;
+  }
+
+  function showSeeingPrompt() {
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:30px;">
+        <h2>Now, list 3 things you are currently seeing:</h2>
+        <textarea id="seeing" rows="3" style="width:80%;padding:10px;"></textarea><br>
+        <button onclick="endPanicSession()" style="margin-top:15px;padding:10px 20px;background:#10b981;color:white;border:none;border-radius:6px;">Finish</button>
+      </div>
+    `;
+  }
+
+  function endPanicSession() {
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:50px;">
+        <h2>Thank you for completing the session 🙏</h2>
+        <p>Take a deep breath and return to the home screen when you’re ready. You can do meditation to get more relief</p>
+        <button onclick="window.location.reload()" style="margin-top:20px;padding:10px 20px;background:#1d4ed8;color:white;border:none;border-radius:6px;">Go to Home</button>
+      </div>
+    `;
+  }
+
+
+</script>
+
+
+
+
 </body>
 </html>
