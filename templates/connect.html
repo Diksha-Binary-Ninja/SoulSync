@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Connect to a User</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Raleway', sans-serif;
+      background: linear-gradient(to bottom right, #e0f2fe, #fdf2f8);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #chatBox {
+      width: 90%;
+      max-width: 600px;
+      height: 80vh;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    #status {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1d4ed8;
+      margin-bottom: 12px;
+    }
+
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      background: #f9fafb;
+      margin-bottom: 12px;
+    }
+
+    #msg {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #sendBtn {
+      background: #3b82f6;
+      color: white;
+    }
+
+    #endBtn {
+      background: #ef4444;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chatBox">
+  <div id="status">Connecting...</div>
+  <div id="chat"></div>
+  <div id="controls">
+    <textarea id="msg" placeholder="Type your message..." rows="2"></textarea>
+    <button id="sendBtn">Send</button>
+    <button id="endBtn">End Chat</button>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  const socket = io();
+  let username = prompt("Enter your name to join:");
+  let typingTimeout;
+
+  const chatBox = document.getElementById("chatBox");
+  const chat = document.getElementById("chat");
+  const msgInput = document.getElementById("msg");
+  const status = document.getElementById("status");
+
+  function appendMessage(text, who = "system") {
+    const msgEl = document.createElement("div");
+    msgEl.style.margin = "8px 0";
+
+    if (who === "you") {
+      msgEl.style.textAlign = "right";
+      msgEl.innerHTML = `<div style="display:inline-block;max-width:75%;background:#3b82f6;color:white;padding:10px 14px;border-radius:16px 16px 0 16px;">${text}</div>`;
+    } else if (who === "partner") {
+      msgEl.style.textAlign = "left";
+      msgEl.innerHTML = `<div style="display:inline-block;max-width:75%;background:#e5e7eb;color:#111827;padding:10px 14px;border-radius:16px 16px 16px 0;">${text}</div>`;
+    } else {
+      msgEl.innerHTML = `<div style="color:#6b7280;font-style:italic;font-size:14px;">${text}</div>`;
+    }
+
+    chat.appendChild(msgEl);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  if (username) {
+    socket.emit("new-user-joined", username);
+  }
+
+  msgInput.addEventListener("keypress", e => {
+    if (e.key === "Enter" && !e.shiftKey && msgInput.value.trim()) {
+      e.preventDefault();
+      socket.emit("send", msgInput.value);
+      appendMessage(msgInput.value, "you");
+      msgInput.value = "";
+    } else {
+      socket.emit("typing", username);
+    }
+  });
+
+  document.getElementById("sendBtn").addEventListener("click", () => {
+    const msg = msgInput.value.trim();
+    if (msg) {
+      socket.emit("send", msg);
+      appendMessage(msg, "you");
+      msgInput.value = "";
+    }
+  });
+
+  document.getElementById("endBtn").addEventListener("click", () => {
+    socket.disconnect();
+    window.location.href = "/";
+  });
+
+  socket.on("connect-user", name => {
+    status.innerText = `You are connected to ${name}`;
+    appendMessage(`${name} joined the chat.`);
+  });
+
+  socket.on("waiting", msg => {
+    status.innerText = msg;
+  });
+
+  socket.on("receive", data => {
+    appendMessage(data.message, "partner");
+  });
+
+  socket.on("user-disconnected", msg => {
+    appendMessage(msg);
+    status.innerText = msg;
+  });
+
+  socket.on("typing", data => {
+    status.innerText = `${data.name} is typing...`;
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      status.innerText = `You are connected to ${data.name}`;
+    }, 2000);
+  });
+</script>
+
+</body>
+</html>
